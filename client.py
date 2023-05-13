@@ -25,7 +25,7 @@ def client_program(host, port, pickling_format):
     client_socket.connect((host, port))
 
     # Create and populate a dictionary
-    dictionary_data = {'Student1': 'Muhammad Abba Shariff', 'Student2': 'Vivien Audoux', 'Student3': 'Moran Ron', 'Student4': 'Sin Yi Cynthia Wong', 'Student5': 'Man Sze Wong'}
+    dictionary_data = {'Student1': 'Muhammad Abba Shariff', 'Student2': 'Vivien Audoux', 'Student4': 'Sin Yi Cynthia Wong', 'Student5': 'Man Sze Wong'}
 
     # Serialize the dictionary data
     serialized_data = serialize_data(dictionary_data, pickling_format)
