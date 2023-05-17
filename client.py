@@ -2,6 +2,7 @@ import socket
 import pickle
 import json
 import xml.etree.ElementTree as ET
+from cryptography.fernet import Fernet  # Importing Fernet for encryption
 
 # Function to serialize the dictionary data based on the pickling format
 def serialize_data(data, format):
@@ -18,8 +19,20 @@ def serialize_data(data, format):
 
     return serialized_data
 
+# Function to encrypt the file content using Fernet encryption
+def encrypt_file_content(file_content, key):
+    f = Fernet(key)
+    encrypted_content = f.encrypt(file_content)
+    return encrypted_content
+
+# Function to read the file content
+def read_file(file_path):
+    with open(file_path, 'rb') as file:
+        file_content = file.read()
+    return file_content
+
 # Main client program
-def client_program(host, port, pickling_format):
+def client_program(host, port, pickling_format, file_path=None, encrypt=False):
     # Set up the client socket
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect((host, port))
@@ -34,9 +47,32 @@ def client_program(host, port, pickling_format):
     data_to_send = f"{pickling_format};".encode() + serialized_data
     client_socket.sendall(data_to_send)
 
+    # If file_path is provided, read the file content and send it to the server
+    if file_path:
+        file_content = read_file(file_path)
+
+        # Encrypt the file content if encrypt flag is set
+        if encrypt:
+            # Generate encryption key
+            key = Fernet.generate_key()
+            encrypted_content = encrypt_file_content(file_content, key)
+
+            # Create a dictionary to send encrypted content and key
+            encrypted_data = {'content': encrypted_content, 'key': key}
+            serialized_encrypted_data = serialize_data(encrypted_data, pickling_format)
+            client_socket.sendall(serialized_encrypted_data)
+        else:
+            # Send the file content as it is
+            client_socket.sendall(file_content)
+
     client_socket.close()
 
 if __name__ == '__main__':
-    client_program(host='127.0.0.1', port=11111, pickling_format='json')
-    #Replace the pickling_format argument with the format: binary (pickle), json or XML)
+    # Specify the host, port, pickling_format, file_path, and encrypt flag
+    host = '127.0.0.1'
+    port = 11111
+    pickling_format = 'json'
+    file_path = 'file.txt'  # Path to the file to be sent
+    encrypt = True  # Set to True if encryption is required, False otherwise
 
+    client_program(host, port, pickling_format, file_path, encrypt)
