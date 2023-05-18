@@ -60,6 +60,32 @@ class TestClientProgram(unittest.TestCase):
         # Assert socket close
         mock_socket_instance.close.assert_called_once()
 
+    # Test client_program function empty input case using a mock socket
+    @patch('socket.socket')
+    def test_client_program(self, mock_socket):
+        host = '127.0.0.1'
+        port = 11111
+        pickling_format = 'json'
+
+        # Set up the mock socket
+        mock_socket_instance = Mock()
+        mock_socket.return_value = mock_socket_instance
+
+        # Call the client_program function
+        client_program(host, port, pickling_format)
+
+        # Assert socket connection
+        mock_socket_instance.connect.assert_called_once_with((host, port))
+
+        # Assert serialized data sent to the server
+        dictionary_data = {}
+        serialized_data = serialize_data(dictionary_data, pickling_format)
+        data_to_send = f"{pickling_format};".encode() + serialized_data
+        mock_socket_instance.sendall.assert_called_once_with(data_to_send)
+
+        # Assert socket close
+        mock_socket_instance.close.assert_called_once()
+
 # Run the tests using the unittest module
 if __name__ == '__main__':
     unittest.main()
