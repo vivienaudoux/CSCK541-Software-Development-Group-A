@@ -1,7 +1,5 @@
 # CSCK541-Software-Development-Group-A
-This README file provides an overview of the code and explains how to use and test it.
 
-Description
 The code consists of two Python scripts: client.py and server.py. These scripts implement a client-server communication using sockets, allowing the client to send data to the server. The data can be serialized in different formats (pickle, JSON, or XML) and optionally encrypted using Fernet encryption.
 
 client.py
