@@ -70,4 +70,4 @@ class TestServerProgram(unittest.TestCase):
         mock_conn.close.assert_called_once()
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(verbosity=2)

@@ -9,6 +9,8 @@ def serialize_data(data, format):
     if format == 'pickle':
         serialized_data = pickle.dumps(data)
     elif format == 'json':
+        if isinstance(data, bytes):
+            data = data.hex()
         serialized_data = json.dumps(data).encode()
     elif format == 'xml':
         root = ET.Element('root')
@@ -53,14 +55,18 @@ def client_program(host, port, pickling_format, file_path=None, encrypt=False):
 
         # Encrypt the file content if encrypt flag is set
         if encrypt:
-            # Generate encryption key
             key = Fernet.generate_key()
             encrypted_content = encrypt_file_content(file_content, key)
 
-            # Create a dictionary to send encrypted content and key
-            encrypted_data = {'content': encrypted_content, 'key': key}
+            # Convert the key to hexadecimal for serialization
+            key_hex = key.hex()
+
+            encrypted_data = {'content': encrypted_content.hex(), 'key': key_hex}
             serialized_encrypted_data = serialize_data(encrypted_data, pickling_format)
-            client_socket.sendall(serialized_encrypted_data)
+
+            # Send the encrypted file content
+            data_to_send = f"{pickling_format};".encode() + serialized_encrypted_data
+            client_socket.sendall(data_to_send)
         else:
             # Send the file content as it is
             client_socket.sendall(file_content)
