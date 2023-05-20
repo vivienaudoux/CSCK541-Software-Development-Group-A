@@ -46,13 +46,6 @@ def server_program(port):
     received_data = handle_received_data(content, format)
     print("Received data:", received_data)
 
-    while True:
-        data = conn.recv(1024).decode()
-        format, content = data.split(';', 1)
-        content = content.encode()
-
-        received_data = handle_received_data(content, format)
-
     # If the received data contains encrypted file content and key
     if isinstance(received_data, dict) and 'content' in received_data and 'key' in received_data:
         encrypted_content = received_data['content']
